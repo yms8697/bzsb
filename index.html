@@ -15,6 +15,7 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
 #mapDiv{height: 100%;width: 100%} 
 #reback{position: absolute;bottom: 10px;right: 100px;z-index: 1002;} 
 #reback a{background-color: #7D7D7D; padding: 10px;color: #FFF;} 
+.pic {width: 1760px;height: 480px}
 </style> 
 <script type="text/javascript" id="codetoshow"> 
     //定义地图对象 
@@ -28,25 +29,49 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
             displayProjection: "EPSG:4490", 
             controls: [ 
             new OpenLayers.Control.Navigation(),
-                            new OpenLayers.Control.Zoom(), 
+            new OpenLayers.Control.Zoom(), 
             new OpenLayers.Control.ArgParser(), 
             new OpenLayers.Control.Attribution()] 
         }); 
         map.addLayer(sdimgLayer); 
-        map.addLayer(sdannoLayer); 
-        map.setCenter(new OpenLayers.LonLat(117.946004, 37.68969), 17); 
+        map.addLayer(sdannoLayer); ;
+        map.setCenter(new OpenLayers.LonLat(117.93341, 37.67119), 16); 
         //添加矢量图层
         var graphicLayer = new OpenLayers.Layer.Vector("graphicLayer",
-            { style: OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']) }); 
-        map.addLayer(graphicLayer); 
-        var pt = new OpenLayers.Geometry.Point(117.946004, 37.68969); 
+            { style: OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']) });
+        map.addLayer(graphicLayer);
+        var coordinates = [
+            {lon: 117.92207,lat: 37.66459},
+            {lon: 117.92381,lat: 37.66487},
+            {lon: 117.92499,lat: 37.66493},
+            {lon: 117.92624,lat: 37.66517},
+            {lon: 117.92748,lat: 37.66530},
+            {lon: 117.92877,lat: 37.66547},
+            {lon: 117.92997,lat: 37.66564},
+            {lon: 117.93128,lat: 37.66581},
+            {lon: 117.93248,lat: 37.66598},
+            {lon: 117.93377,lat: 37.66613},
+            {lon: 117.93516,lat: 37.66628},
+            {lon: 117.93600,lat: 37.66633},
+            {lon: 117.93735,lat: 37.66637},
+            {lon: 117.93872,lat: 37.66654},
+            {lon: 117.94010,lat: 37.66675},
+            {lon: 117.94130,lat: 37.66680},
+            {lon: 117.94259,lat: 37.66690},
+            {lon: 117.94383,lat: 37.66706},
+            {lon: 117.94508,lat: 37.66699},
+        ];
         var style = {
-            externalGraphic: 'img/pin.png', 
-            graphicWidth: 60, 
-            graphicHeight: 60 
+            externalGraphic: 'img/shuibiao.png', 
+            graphicWidth: 50, 
+            graphicHeight: 50 
         }; 
-        var feature = new OpenLayers.Feature.Vector(pt, null, style); 
-        graphicLayer.addFeatures([feature]); 
+        for(var i = 0; i < 19; i++) {
+            var pt = new OpenLayers.Geometry.Point(coordinates[i].lon, coordinates[i].lat); 
+            var feature = new OpenLayers.Feature.Vector(pt, {i}, style);
+            graphicLayer.addFeatures([feature]);
+        }
+
         //坐标转换  
         function corTransform(lon, lat) {  
             var proj = new OpenLayers.Projection("EPSG:4326");  
@@ -54,6 +79,31 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
             lonlat.transform(proj, this.map.getProjectionObject());  
             return lonlat;   
         }
+
+        // 水表点击事件注册
+        var selectControl = new OpenLayers.Control.SelectFeature([graphicLayer]);
+        map.addControl(selectControl); 
+        selectControl.activate(); 
+        function featureSelected(fea) {
+            var feature = fea.feature;
+            console.log(feature);
+            var dom = "<div><div style='width: 200px;padding: 0 15px'>"
+            +"<div><h4>详细信息</h4></div>"
+            +"<p>信息1</p>"
+            +"<p>信息2</p>"
+            +"<p>信息3</p>"
+            +"<p>信息4</p>"
+            +"<p>信息5</p>"
+            +"</div></div>";
+            var popup = new OpenLayers.Popup.FramedCloud("xx", 
+                new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y),
+                null, dom, null, true);
+            map.addPopup(popup, true);
+            console.log(popup);
+            selectControl.unselectAll(); 
+        }
+        graphicLayer.events.on({ "featureselected": featureSelected }); 
+        /*
         map.events.register('click', null, function (e) {          
             var pos = $(map.div).offset();
             //坐标转换
@@ -61,6 +111,11 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
             var lonlat = map.getLonLatFromPixel(px);
             alert(lonlat.lon.toFixed(5) + ";" + lonlat.lat.toFixed(5));
         })
+        */
+        $(document).keydown(function(event){
+            if(event.keyCode == 81)
+                $('#pic').toggle();            
+        });
     }); 
 </script> 
 </head> 
@@ -69,5 +124,6 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
         <div id="mapDiv"> 
         </div> 
     </div>
+    <img id="pic" style="position:absolute;left:-200px;top:0;z-index:999999" class="pic" src="img/cad.png"/>
 </body> 
 </html> 
