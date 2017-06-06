@@ -1,53 +1,63 @@
-<!doctype html>  
-<html lang="en">  
-  <head>  
-    <meta charset="utf-8">  
-    <link rel="stylesheet" href="http://openlayers.org/en/v3.3.0/css/ol.css" type="text/css">  
-    <style>  
-      .map {  
-        height: 500px;  
-        width: 100%;  
-      }  
-    </style>  
-    <title>OpenLayers 3 example</title>  
-  </head>  
-  <body>  
-    <h2>My Map</h2>  
-    <div id="map" class="map">  
-    </div>  
-    <script src="http://openlayers.org/en/v3.3.0/build/ol.js" type="text/javascript"></script>  
-    <script type="text/javascript">  
-		/** 
-		* 定义一些全局变量 
-		*/  
-		var map;  
-		var tian_di_tu_satellite_layer = new ol.layer.Tile({
-			title: "天地图卫星影像",
-			source: new ol.source.XYZ({
-				url: 'http://t3.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}'
-			})
-		});
-		var tian_di_tu_annotation = new ol.layer.Tile({
-			title: "天地图文字标注",
-			source: new ol.source.XYZ({
-				url: 'http://t3.tianditu.com/DataServer?T=cva_w&x={x}&y={y}&l={z}'
-			})
-		});
-		map = new ol.Map({  
-			target: 'map',  
-			layers: [  
-			  new ol.layer.Tile({  
-				source: new ol.source.OSM()
-			  })
-			],  
-			view: new ol.View({  
-			  center: ol.proj.transform([120, 37], 'EPSG:4326', 'EPSG:3857'),  
-			  zoom: 3
-			})  
-		  }); 
-	map.addLayer(tian_di_tu_satellite_layer);
-	map.addLayer(tian_di_tu_annotation);
-	
-    </script>  
-  </body>  
-</html>  
+<!doctype html> 
+<html> 
+<head> 
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" /> 
+    <meta name="keywords" content="天地图山东" /> 
+    <title>天地图－地图API－范例－WMS-C图层加载</title> 
+    <script src="http://www.sdmap.gov.cn/api/olapi/js/jquery-1.6.4.min.js"></script> 
+    <!--[if lt IE 9]> 
+    <script src="http://www.sdmap.gov.cn/api/olapi/js/html5.js"></script> 
+    <![endif]--> 
+    <script type="text/javascript" src="http://www.sdmap.gov.cn/api/olapi/ol/openlayers.js"></script> 
+  <style type="text/css"> 
+body{width: 100%;height: 100%;position: absolute;margin: 0;} 
+#outter{height: 100%} 
+#mapDiv{height: 100%;width: 100%} 
+#reback{position: absolute;bottom: 10px;right: 100px;z-index: 1002;} 
+#reback a{background-color: #7D7D7D; padding: 10px;color: #FFF;} 
+ </style> 
+    <script type="text/javascript" id="codetoshow"> 
+ 
+        //定义地图对象 
+        var map; 
+				var sdannoLayer = new SDRSAnnoLayer();
+				var sdimgLayer = new SDRasterLayer(); 
+        $(function () { 
+            map = new OpenLayers.Map("mapDiv", { 
+                allOverlays: true, 
+                numZoomLevels: 19, 
+                displayProjection: "EPSG:4490", 
+                controls: [ 
+                new OpenLayers.Control.Navigation(),
+								new OpenLayers.Control.Zoom(), 
+                new OpenLayers.Control.ArgParser(), 
+                new OpenLayers.Control.Attribution()] 
+            }); 
+           	map.addLayer(sdimgLayer); 
+						map.addLayer(sdannoLayer); 
+            map.setCenter(new OpenLayers.LonLat(119.00, 36.40), 8); 
+						//添加矢量图层
+						var graphicLayer = new OpenLayers.Layer.Vector("graphicLayer", 
+							{ style: OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']) }); 
+						map.addLayer(graphicLayer); 
+						var pt = new OpenLayers.Geometry.Point(119.00, 36.40); 
+            var style = { 
+                externalGraphic: 'img/pin.png', 
+                graphicWidth: 60, 
+                graphicHeight: 60 
+            }; 
+            var feature = new OpenLayers.Feature.Vector(pt, null, style); 
+            graphicLayer.addFeatures([feature]); 
+
+        }); 
+         
+ 
+    </script> 
+</head> 
+<body> 
+    <div id="outter"> 
+        <div id="mapDiv"> 
+        </div> 
+    </div>
+</body> 
+</html> 
