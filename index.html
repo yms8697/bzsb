@@ -142,13 +142,29 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
 
             // 土壤监测站数据
             {lon: 117.93439,lat: 37.66656},
+
+            // 二批水表
+            {lon: 117.93159,lat: 37.67577},
+            {lon: 117.93236,lat: 37.67644},
+            {lon: 117.93371,lat: 37.67659},
+            {lon: 117.93517,lat: 37.67680},
+            {lon: 117.93620,lat: 37.67702},
+            {lon: 117.94131,lat: 37.67805},
+            {lon: 117.94195,lat: 37.67783},
+            {lon: 117.94255,lat: 37.67800},
+            {lon: 117.94315,lat: 37.67798},
+            {lon: 117.94380,lat: 37.67809},
+
+            {lon: 117.94444,lat: 37.67813},
+            {lon: 117.93191,lat: 37.67148},
+            {lon: 117.93259,lat: 37.67178},
+            {lon: 117.93408,lat: 37.67225},
+            {lon: 117.93693,lat: 37.67257},
+            {lon: 117.93963,lat: 37.67302},
+            {lon: 117.94169,lat: 37.67345},
+            {lon: 117.94371,lat: 37.67354},
+            {lon: 117.94556,lat: 37.67393},
         ];
-        var shuibiaoStyle = {
-            externalGraphic: 'img/shuibiao.png', 
-            graphicWidth: 30, 
-            graphicHeight: 30,
-           
-        }; 
         var bengfangStyle = {
             externalGraphic: 'img/bengfang.png', 
             graphicWidth: 50, 
@@ -166,7 +182,34 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
         };
         // 渲染水表
         for(var i = 0; i < 19; i++) {
-            var pt = new OpenLayers.Geometry.Point(coordinates[i].lon, coordinates[i].lat); 
+            var pt = new OpenLayers.Geometry.Point(coordinates[i].lon, coordinates[i].lat);
+            var shuibiaoStyle = {
+                externalGraphic: 'img/shuibiao.png', 
+                graphicWidth: 30, 
+                graphicHeight: 30,
+                fontSize: "14px",
+                fontColor: "#ff0000",
+                fontWeight: "bold",
+                labelXOffset: 0,
+                labelYOffset: 18,
+            };
+            shuibiaoStyle.label = '' + (i + 1) + '';
+            var feature = new OpenLayers.Feature.Vector(pt, {i}, shuibiaoStyle);
+            graphicLayer.addFeatures([feature]);
+        }
+        for(var i = 23; i < 42; i++) {
+            var pt = new OpenLayers.Geometry.Point(coordinates[i].lon, coordinates[i].lat);
+            var shuibiaoStyle = {
+                externalGraphic: 'img/shuibiao.png', 
+                graphicWidth: 30, 
+                graphicHeight: 30,
+                fontSize: "14px",
+                fontColor: "#ff0000",
+                fontWeight: "bold",
+                labelXOffset: 0,
+                labelYOffset: 18,
+            };
+            shuibiaoStyle.label = '' + (i - 22) + ''; 
             var feature = new OpenLayers.Feature.Vector(pt, {i}, shuibiaoStyle);
             graphicLayer.addFeatures([feature]);
         }
@@ -300,6 +343,6 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
         <div id="mapDiv"> 
         </div> 
     </div>
-    <img id="pic" style="display:none;position:absolute;left:-200px;top:0;z-index:999999" class="pic" src="img/cad.png"/>
+    <img id="pic" style="display:none;position:absolute;left:-200px;top:0;z-index:999999" class="pic" src="img/cad2.png"/>
 </body> 
 </html> 
