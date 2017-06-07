@@ -60,15 +60,29 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
             {lon: 117.94259,lat: 37.66690},
             {lon: 117.94383,lat: 37.66706},
             {lon: 117.94508,lat: 37.66699},
+
+            // 泵房坐标
+            {lon: 117.93403,lat: 37.66537},
+            {lon: 117.93506,lat: 37.66555},
         ];
-        var style = {
+        var shuibiaoStyle = {
             externalGraphic: 'img/shuibiao.png', 
+            graphicWidth: 30, 
+            graphicHeight: 30
+        }; 
+        var bengfangStyle = {
+            externalGraphic: 'img/bengfang.png', 
             graphicWidth: 50, 
-            graphicHeight: 50 
+            graphicHeight: 21 
         }; 
         for(var i = 0; i < 19; i++) {
             var pt = new OpenLayers.Geometry.Point(coordinates[i].lon, coordinates[i].lat); 
-            var feature = new OpenLayers.Feature.Vector(pt, {i}, style);
+            var feature = new OpenLayers.Feature.Vector(pt, {i}, shuibiaoStyle);
+            graphicLayer.addFeatures([feature]);
+        }
+        for(var i = 19; i < 21; i++) {
+            var pt = new OpenLayers.Geometry.Point(coordinates[i].lon, coordinates[i].lat); 
+            var feature = new OpenLayers.Feature.Vector(pt, {i}, bengfangStyle);
             graphicLayer.addFeatures([feature]);
         }
 
@@ -103,7 +117,7 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
             selectControl.unselectAll(); 
         }
         graphicLayer.events.on({ "featureselected": featureSelected }); 
-        /*
+        
         map.events.register('click', null, function (e) {          
             var pos = $(map.div).offset();
             //坐标转换
@@ -111,7 +125,7 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
             var lonlat = map.getLonLatFromPixel(px);
             alert(lonlat.lon.toFixed(5) + ";" + lonlat.lat.toFixed(5));
         })
-        */
+        
         $(document).keydown(function(event){
             if(event.keyCode == 81)
                 $('#pic').toggle();            
