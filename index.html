@@ -40,8 +40,12 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
         var graphicLayer = new OpenLayers.Layer.Vector("graphicLayer",
             { style: OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']) });
         map.addLayer(graphicLayer);
-
-
+        var zoom=map.getZoom();
+        //监听地图缩放事件
+        map.events.register('zoomend', this, function(evt) { 
+            
+         });
+        
         // 总管
         var zgCoordinates = [
             [{lon: 117.91929,lat: 37.66426}, {lon: 117.94504,lat: 37.66707}]
@@ -142,7 +146,8 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
         var shuibiaoStyle = {
             externalGraphic: 'img/shuibiao.png', 
             graphicWidth: 30, 
-            graphicHeight: 30
+            graphicHeight: 30,
+           
         }; 
         var bengfangStyle = {
             externalGraphic: 'img/bengfang.png', 
