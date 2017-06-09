@@ -9,15 +9,23 @@
     <script src="http://www.sdmap.gov.cn/api/olapi/js/html5.js"></script> 
     <![endif]--> 
     <script type="text/javascript" src="http://www.sdmap.gov.cn/api/olapi/ol/openlayers.js"></script> 
-  <style type="text/css"> 
-body{width: 100%;height: 100%;position: absolute;margin: 0;} 
-#outter{height: 100%} 
-#mapDiv{height: 100%;width: 100%} 
-#reback{position: absolute;bottom: 10px;right: 100px;z-index: 1002;} 
-#reback a{background-color: #7D7D7D; padding: 10px;color: #FFF;} 
-.pic {width: 1760px;height: 480px}
-</style> 
-<script type="text/javascript" id="codetoshow"> 
+    <style type="text/css"> 
+        body{width: 100%;height: 100%;position: absolute;margin: 0;} 
+        #outter{height: 100%} 
+        #mapDiv{height: 100%;width: 100%} 
+        #reback{position: absolute;bottom: 10px;right: 100px;z-index: 1002;} 
+        #reback a{background-color: #7D7D7D; padding: 10px;color: #FFF;} 
+        .pic {width: 1760px;height: 480px}
+    </style>
+</head> 
+<body> 
+    <div id="outter"> 
+        <div id="mapDiv"> 
+        </div> 
+    </div>
+    <img id="pic" style="display:none;position:absolute;left:-200px;top:0;z-index:999999" class="pic" src="img/cad2.png"/>
+    <script type="text/javascript" src="script/coordinateData.js"></script>  
+    <script type="text/javascript" id="codetoshow"> 
     //定义地图对象 
     var map; 
     var sdannoLayer = new SDRSAnnoLayer();
@@ -40,15 +48,10 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
         var graphicLayer = new OpenLayers.Layer.Vector("graphicLayer",
             { style: OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']) });
         map.addLayer(graphicLayer);
-        var zoom=map.getZoom();
-        //监听地图缩放事件
-        map.events.register('zoomend', this, function(evt) { 
-            
-         });
-        
         // 总管
         var zgCoordinates = [
-            [{lon: 117.91929,lat: 37.66426}, {lon: 117.94504,lat: 37.66707}]
+            [{lon: 117.91929,lat: 37.66426}, {lon: 117.94504,lat: 37.66707}],
+             [{lon: 117.92451,lat: 37.67027}, {lon: 117.94631,lat: 37.67374}]
         ];
         var zgStyle = {
             strokeColor: '#271ed9',
@@ -66,33 +69,7 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
             graphicLayer.addFeatures([feature]);
         }
 
-        // 普通管线绘制
-        var lineCoordinates = [
-            [{lon: 117.91929,lat: 37.66426}, {lon: 117.91828,lat: 37.66580}, {lon: 117.91800,lat: 37.66862}],
-            [{lon: 117.91963,lat: 37.66422}, {lon: 117.91929,lat: 37.66907}],
-            [{lon: 117.92101,lat: 37.66439}, {lon: 117.92058,lat: 37.66924}],
-            [{lon: 117.92210,lat: 37.66450}, {lon: 117.92167,lat: 37.66937}],
-            [{lon: 117.92373,lat: 37.66473}, {lon: 117.92287,lat: 37.66962}],
-            [{lon: 117.92489,lat: 37.66486}, {lon: 117.92401,lat: 37.66984}],
-            [{lon: 117.92618,lat: 37.66507}, {lon: 117.92519,lat: 37.67007}],
-            [{lon: 117.92742,lat: 37.66520}, {lon: 117.92648,lat: 37.67025}],
-            [{lon: 117.92871,lat: 37.66535}, {lon: 117.92777,lat: 37.67040}],
-            [{lon: 117.92991,lat: 37.66553}, {lon: 117.92897,lat: 37.67057}],
-            [{lon: 117.93120,lat: 37.66563}, {lon: 117.93026,lat: 37.67070}],
-            [{lon: 117.93244,lat: 37.66585}, {lon: 117.93150,lat: 37.67083}],
-            [{lon: 117.93371,lat: 37.66606}, {lon: 117.93274,lat: 37.67108}],
-            [{lon: 117.93506,lat: 37.66623}, {lon: 117.93412,lat: 37.67125}],
-            [{lon: 117.93601,lat: 37.66628}, {lon: 117.93536,lat: 37.67160}],
-            [{lon: 117.93729,lat: 37.66632}, {lon: 117.93669,lat: 37.67177}],
-            [{lon: 117.93871,lat: 37.66647}, {lon: 117.93789,lat: 37.67203}],
-            [{lon: 117.94000,lat: 37.66662}, {lon: 117.93927,lat: 37.67203}],
-            [{lon: 117.94120,lat: 37.66675}, {lon: 117.94056,lat: 37.67228}],
-            [{lon: 117.94249,lat: 37.66683}, {lon: 117.94184,lat: 37.67228}],
-            [{lon: 117.94382,lat: 37.66698}, {lon: 117.94304,lat: 37.67241}],
-            [{lon: 117.94506,lat: 37.66705}, {lon: 117.94429,lat: 37.67293}],
-            [{lon: 117.94504,lat: 37.66707}, {lon: 117.94596,lat: 37.66919}, {lon: 117.94553,lat: 37.67289}],               
-        ];
-
+        
         var lineStyle = {
             strokeColor: '#cfcfcf',
             strokeWidth: 5,
@@ -110,61 +87,6 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
             lineFeatureArray.push(lineFeature);
             graphicLayer.addFeatures([lineFeature]);
         }
-
-        // 点绘制
-        var coordinates = [
-            {lon: 117.92207,lat: 37.66459},
-            {lon: 117.92381,lat: 37.66487},
-            {lon: 117.92499,lat: 37.66493},
-            {lon: 117.92624,lat: 37.66517},
-            {lon: 117.92748,lat: 37.66530},
-            {lon: 117.92877,lat: 37.66547},
-            {lon: 117.92997,lat: 37.66564},
-            {lon: 117.93128,lat: 37.66581},
-            {lon: 117.93248,lat: 37.66598},
-            {lon: 117.93377,lat: 37.66613},
-            {lon: 117.93516,lat: 37.66628},
-            {lon: 117.93600,lat: 37.66633},
-            {lon: 117.93735,lat: 37.66637},
-            {lon: 117.93872,lat: 37.66654},
-            {lon: 117.94010,lat: 37.66675},
-            {lon: 117.94130,lat: 37.66680},
-            {lon: 117.94259,lat: 37.66690},
-            {lon: 117.94383,lat: 37.66706},
-            {lon: 117.94508,lat: 37.66699},
-
-            // 泵房坐标
-            {lon: 117.93361,lat: 37.66540},
-            {lon: 117.93537,lat: 37.66555},
-
-            // 气象站坐标
-            {lon: 117.93449,lat: 37.66573},
-
-            // 土壤监测站数据
-            {lon: 117.93439,lat: 37.66656},
-
-            // 二批水表
-            {lon: 117.93159,lat: 37.67577},
-            {lon: 117.93236,lat: 37.67644},
-            {lon: 117.93371,lat: 37.67659},
-            {lon: 117.93517,lat: 37.67680},
-            {lon: 117.93620,lat: 37.67702},
-            {lon: 117.94131,lat: 37.67805},
-            {lon: 117.94195,lat: 37.67783},
-            {lon: 117.94255,lat: 37.67800},
-            {lon: 117.94315,lat: 37.67798},
-            {lon: 117.94380,lat: 37.67809},
-
-            {lon: 117.94444,lat: 37.67813},
-            {lon: 117.93191,lat: 37.67148},
-            {lon: 117.93259,lat: 37.67178},
-            {lon: 117.93408,lat: 37.67225},
-            {lon: 117.93693,lat: 37.67257},
-            {lon: 117.93963,lat: 37.67302},
-            {lon: 117.94169,lat: 37.67345},
-            {lon: 117.94371,lat: 37.67354},
-            {lon: 117.94556,lat: 37.67393},
-        ];
         var bengfangStyle = {
             externalGraphic: 'img/bengfang.png', 
             graphicWidth: 50, 
@@ -337,12 +259,5 @@ body{width: 100%;height: 100%;position: absolute;margin: 0;}
         });
     }); 
 </script> 
-</head> 
-<body> 
-    <div id="outter"> 
-        <div id="mapDiv"> 
-        </div> 
-    </div>
-    <img id="pic" style="display:none;position:absolute;left:-200px;top:0;z-index:999999" class="pic" src="img/cad2.png"/>
 </body> 
 </html> 
