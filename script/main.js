@@ -22,7 +22,7 @@ $(function () {
     map.addLayer(graphicLayer);
 
     var zgStyle = {
-        strokeColor: '#271ed9',
+        strokeColor: '#0080FF',
         strokeWidth: 8,
     };
     for(var i = 0; i < zgCoordinates.length; i++) {
@@ -99,18 +99,26 @@ $(function () {
     }
     // 气象站
     var pt = new OpenLayers.Geometry.Point(qxzCoordinates[0].lon, qxzCoordinates[0].lat); 
-        var feature = new OpenLayers.Feature.Vector(pt, {id: 'qx' + 0}, qixiangzhanStyle);
-        graphicLayer.addFeatures([feature]);
+    var feature = new OpenLayers.Feature.Vector(pt, {id: 'qx' + 0}, qixiangzhanStyle);
+    graphicLayer.addFeatures([feature]);
     // 土壤监测站
     var pt = new OpenLayers.Geometry.Point(trzCoordinates[0].lon, trzCoordinates[0].lat); 
-        var feature = new OpenLayers.Feature.Vector(pt, {id: 'tr' + 0}, turangzhanStyle);
-        graphicLayer.addFeatures([feature]);
+    var feature = new OpenLayers.Feature.Vector(pt, {id: 'tr' + 0}, turangzhanStyle);
+    graphicLayer.addFeatures([feature]);
     
     // 水流绘制
     var flag = 0;
-    setTimeout(function(){     
-        for(var i = 0; i < lineCoordinates.length; i++)
-            move(0, 1, lineCoordinates[i]);
+    // 生成随机流水数组
+    var arr = [];
+    for(var i = 0; i < 5; i++){
+        arr[i] = parseInt(lineCoordinates.length * Math.random());
+    }
+    console.log(arr);
+    setTimeout(function(){    
+        for(var i = 0; i < lineCoordinates.length; i++) {
+            if($.inArray(i, arr) != -1)
+                move(0, 1, lineCoordinates[i]);
+        }
     }, 500);
     ///根据序列点坐标 进行移动 
     function move(start, end, points) {
@@ -119,7 +127,7 @@ $(function () {
         var x2 = points[end].lon;
         var y2 = points[end].lat;
         var p = (y2 - y1) / (x2 - x1); //斜率
-        var v = 0.0001; //速度 
+        var v = 0.000025; //速度 
         var x = points[start].lon;
         var y = points[start].lat;
         var lastFeature;
@@ -139,7 +147,7 @@ $(function () {
                 new OpenLayers.Geometry.Point(x, y),
             ]);
             var feature = new OpenLayers.Feature.Vector(line, null, {
-                strokeColor: '#271ed9',
+                strokeColor: '#0080FF',
                 strokeWidth: 5,
             });
             graphicLayer.addFeatures([feature]);
@@ -150,7 +158,7 @@ $(function () {
             //图层刷新 
             // map.graphics.redraw(); 
             graphicLayer.redraw(); 
-            if (Math.abs(x - x2) < 0.0001 && Math.abs(y - y2) < 0.0001) {
+            if (Math.abs(x - x2) < v && Math.abs(y - y2) < v) {
                 clearInterval(moving); 
                 start++; 
                 end++; 
@@ -160,10 +168,12 @@ $(function () {
                 if(end === points.length){
                     flag++;
                 }
+                /*
                 if(flag >= lineCoordinates.length){
                     lineFeatureArray[i].style.strokeColor = '#271ed9';
                     graphicLayer.redraw();
                 }
+                */
             } 
         }, 50); 
     }
@@ -212,24 +222,25 @@ $(function () {
             var TotalAmount = status['TotalAmount'] ? status['TotalAmount'] : '暂无数据';
             var WaterFlow = status['WaterFlow'] ? status['WaterFlow'] : '暂无数据';
 
-            dom = "<div><div style='width: 400px;padding: 0 15px'>"
-            +"<div><h4>详细信息</h4></div>"
-            +"<p>ID："+status['DBID']+"</p>"
-            +"<p>用户卡号："+status['CardCode']+"</p>"
-            +"<p>创建时间："+CreateTime+"</p>"
-            +"<p>结束用量："+EndAmount+"</p>"
-            +"<p>结束时间："+EndTime+"</p>"
-            +"<p>施肥器状态："+FertilizerStus+"</p>"
-            +"<p>起始用量："+StartAmount+"</p>"
-            +"<p>开始时间："+StartTime+"</p>"
-            +"<p>剩余量："+SurplusAmount+"</p>"
-            +"<p>设备编号："+status['TerminalCode']+"</p>"
-            +"<p>设备状态："+TerminalStatus+"</p>"
-            +"<p>本次用量："+ThisUsedAmount+"</p>"
-            +"<p>总用量："+TotalAmount+"</p>"
-            +"<p>修改时间："+updatetime+"</p>"
-            +"<p>流量、流速："+WaterFlow+"</p>"
-            +"</div></div>";
+            dom = "<div><div style='width: 600px;padding: 0 15px'>"
+            +"<div><h4>详细信息</h4></div><table class='table'>"
+            +"<tr><td class='table-head'>ID</td><td>"+status['DBID']+"</td>"
+            +"<td class='table-head'>用户卡号</td><td>"+status['CardCode']+"</td></tr>"
+            +"<tr><td class='table-head'>创建时间</td><td>"+CreateTime+"</td>"
+            +"<td class='table-head'>结束用量</td><td>"+EndAmount+"</td></tr>"
+            +"<tr><td class='table-head'>结束时间</td><td>"+EndTime+"</td>"
+            +"<td class='table-head'>施肥器状态</td><td>"+FertilizerStus+"</td></tr>"
+            +"<tr><td class='table-head'>起始用量</td><td>"+StartAmount+"</td>"
+            +"<td class='table-head'>开始时间</td><td>"+StartTime+"</td></tr>"
+            +"<tr><td class='table-head'>剩余量</td><td>"+SurplusAmount+"</td>"
+            +"<td class='table-head'>设备编号</td><td>"+status['TerminalCode']+"</td></tr>"
+            +"<tr><td class='table-head'>设备状态</td><td>"+TerminalStatus+"</td>"
+            +"<td class='table-head'>本次用量</td><td>"+ThisUsedAmount+"</td></tr>"
+            +"<tr><td class='table-head'>总用量</td><td>"+TotalAmount+"</td>"
+            +"<td class='table-head'>修改时间</td><td>"+updatetime+"</td></tr>"
+            +"<tr><td class='table-head'>流量、流速</td><td>"+WaterFlow+"</td>"
+            +"<td></td><td></td></tr>"
+            +"<table></div></div>";
         } else {
             dom = "<div><div style='min-height: 100px;width: 400px;padding: 0 15px'>"
             +"<div><h4>详细信息</h4></div>"
