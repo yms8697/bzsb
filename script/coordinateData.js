@@ -130,7 +130,11 @@ var bfCoordinates = [
     {lon: 117.93361,lat: 37.66540},
     {lon: 117.93537,lat: 37.66555},
 ];
-
+//泵房信息
+var bfData={
+        bf0:{bfbh:'BZ04',area:3064,flow:1163,sjyc:20.2,lxbxx:{xh:'250SS30',flow:635,yc:21.0,pw:55},diameter:"600-200/200/315/400"},
+        bf1:{bfbh:'BZ05',area:2697,flow:952,sjyc:19.9,lxbxx:{xh:'250S-24',flow:486,yc:23.5,pw:45},diameter:'600-200/355/355'}
+    }
 // 气象站坐标
 var qxzCoordinates = [
     {lon: 117.93449,lat: 37.66573},

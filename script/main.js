@@ -20,7 +20,6 @@ $(function () {
     var graphicLayer = new OpenLayers.Layer.Vector("graphicLayer",
         { style: OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']) });
     map.addLayer(graphicLayer);
-
     var zgStyle = {
         strokeColor: '#0080FF',
         strokeWidth: 8,
@@ -186,75 +185,152 @@ $(function () {
         return lonlat;   
     }
 
-    // 水表点击事件注册
+    // 点击事件注册
     var selectControl = new OpenLayers.Control.SelectFeature([graphicLayer]);
     map.addControl(selectControl); 
     selectControl.activate(); 
     function featureSelected(fea) {
         var feature = fea.feature;
         var id = feature.data.id;
-        // 检索当前水表状态
-        var status; // 当前数据
-        for(var i = 0;i < useWaterInf.length;i++) {
-            if(useWaterInf[i].TerminalCode == sbCoordinates[id].terminalCode) {
-                status = useWaterInf[i];
+        //泵房点击事件
+        if(/^bf/.test(id)){
+            console.log(bfData[id].bfbh);
+            bfpopupShow(id);
+            function bfpopupShow(id){
+                var dom='';
+                dom = "<div><div style='width: 620px;padding: 0 15px'>"
+                    +"<div style='text-align:center;'><h4>详细信息</h4></div><table class='table'>"
+                    +"<tr><td class='table-head'>泵站编号</td><td>"+bfData[id]['bfbh']+"</td>"
+                    +"<td class='table-head'>控制面积（亩）</td><td>"+bfData[id]['area']+"</td></tr>"
+                    +"<tr><td class='table-head'>泵站设计流量（m³/h）</td><td>"+bfData[id]['flow']+"</td>"
+                    +"<td class='table-head'>泵站设计扬程（m）</td><td>"+bfData[id]['sjyc']+"</td></tr>"
+                    +"<tr><td colspan='2' class='table-head'>集水管及其连接输水管道直径（mm）</td><td colspan='2'>"+bfData[id]['diameter']+"</td>"
+                    +"<tr><td colspan='4' class='table-head'>离心泵选型</td></tr>"
+                    +"<tr><td class='table-head'>型号</td><td>"+bfData[id]['lxbxx']['xh']+"</td>"
+                    +"<td class='table-head'>流量（m³/h）</td><td>"+bfData[id]['lxbxx']['flow']+"</td></tr>"
+                    +"<tr><td class='table-head'>扬程（m）</td><td>"+bfData[id]['lxbxx']['yc']+"</td>"
+                    +"<td class='table-head'>单机功率（KW）</td><td>"+bfData[id]['lxbxx']['pw']+"</td></tr>"
+                    +"<tr><td class='table-head'>机组数量（台套）</td><td>2</td>"
+                    +"<td colspan='2'></td></tr>"
+                    +"<tr><td colspan='4' class='table-head'>潜污泵选型</td></tr>"
+                    +"<tr><td class='table-head'>型号</td><td>150QW110-15-7.5</td>"
+                    +"<td class='table-head'>流量（m³/h）</td><td>110</td></tr>"
+                    +"<tr><td class='table-head'>扬程（m）</td><td>15</td>"
+                    +"<td class='table-head'>单机功率（KW）</td><td>7.5</td></tr>"
+                    +"<tr><td class='table-head'>机组数量（台套）</td><td>2</td>"
+                    +"<td colspan='2'></td></tr>"
+                    +"<table></div></div>";
+                var popup = new OpenLayers.Popup.FramedCloud("xx", 
+                    new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y),
+                    null, dom, null, true);
+                map.addPopup(popup, true);
+                // console.log(popup);
+                selectControl.unselectAll(); 
             }
         }
-        for(var i = 0;i < singleUseWaterInf.length;i++) {
-            if(singleUseWaterInf[i].TerminalCode == sbCoordinates[id].terminalCode) {
-                status = singleUseWaterInf[i];
+        //气象站点击
+        else if(/^qx/.test(id)){
+            var dom='';
+            dom = "<div><div style='width: 620px;padding: 0 15px'>"
+                +"<div style='text-align:center;'><h4>详细信息</h4></div><table class='table'>"
+                +"<tr><td class='table-head'>空气温度</td><td>23.71</td>"
+                +"<td class='table-head'>空气湿度</td><td>66.48</td></tr>"
+                +"<tr><td class='table-head'>CO2浓度</td><td>462.04</td>"
+                +"<td class='table-head'>风向</td><td>19560.00</td></tr>"
+                +"<tr><td class='table-head'>风速</td><td >1.42</td>"
+                +"<td class='table-head'>光照</td><td>0.00</td></tr>"
+                +"<tr><td class='table-head'>降雨量</td><td>无降雨</td>"
+                +"<td colspan='2'></td></tr>"
+                +"<table></div></div>";
+            var popup = new OpenLayers.Popup.FramedCloud("xx", 
+                new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y),
+                null, dom, null, true);
+            map.addPopup(popup, true);
+            // console.log(popup);
+            selectControl.unselectAll(); 
+        }
+        //土壤站点击
+        else if(/^tr/.test(id)){
+            var dom='';
+            dom = "<div><div style='width: 620px;padding: 0 15px'>"
+                +"<div style='text-align:center;'><h4>详细信息</h4></div><table class='table'>"
+                +"<tr><td class='table-head'>土壤温度</td><td>19.45</td>"
+                +"<td class='table-head'>土壤湿度</td><td>18.52</td></tr>"
+                +"<table></div></div>";
+            var popup = new OpenLayers.Popup.FramedCloud("xx", 
+                new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y),
+                null, dom, null, true);
+            map.addPopup(popup, true);
+            // console.log(popup);
+            selectControl.unselectAll(); 
+        }
+        //水表点击
+        else{
+            // 检索当前水表状态
+            var status; // 当前数据
+            for(var i = 0;i < useWaterInf.length;i++) {
+                if(useWaterInf[i].TerminalCode == sbCoordinates[id].terminalCode) {
+                    status = useWaterInf[i];
+                }
             }
-        }
-        // console.log(status);
-        var dom = '';
-        if(status) {
-            var CreateTime = status['CreateTime'] ? status['CreateTime'].date.split('.')[0] : '暂无数据';
-            var EndTime = status['EndTime'] ? status['EndTime'].date.split('.')[0] : '暂无数据';
-            var StartTime = status['StartTime'] ? status['StartTime'].date.split('.')[0] : '暂无数据';
-            var updatetime = status['updatetime'] ? status['updatetime'].date.split('.')[0] : '暂无数据';
+            for(var i = 0;i < singleUseWaterInf.length;i++) {
+                if(singleUseWaterInf[i].TerminalCode == sbCoordinates[id].terminalCode) {
+                    status = singleUseWaterInf[i];
+                }
+            }
+            // console.log(status);
+            var dom = '';
+            if(status) {
+                var CreateTime = status['CreateTime'] ? status['CreateTime'].date.split('.')[0] : '暂无数据';
+                var EndTime = status['EndTime'] ? status['EndTime'].date.split('.')[0] : '暂无数据';
+                var StartTime = status['StartTime'] ? status['StartTime'].date.split('.')[0] : '暂无数据';
+                var updatetime = status['updatetime'] ? status['updatetime'].date.split('.')[0] : '暂无数据';
 
-            var FertilizerStus = status['FertilizerStus'] ? status['FertilizerStus'] : '暂无数据';
-            var EndAmount = status['EndAmount'] ? status['EndAmount'] : '暂无数据';
-            var StartAmount = status['StartAmount'] ? status['StartAmount'] : '暂无数据';
-            var SurplusAmount = status['SurplusAmount'] ? status['SurplusAmount'] : '暂无数据';
-            var TerminalStatus = status['TerminalStatus'] ? status['TerminalStatus'] : '暂无数据';
-            var ThisUsedAmount = status['ThisUsedAmount'] ? status['ThisUsedAmount'] : '暂无数据';
-            var TotalAmount = status['TotalAmount'] ? status['TotalAmount'] : '暂无数据';
-            var WaterFlow = status['WaterFlow'] ? status['WaterFlow'] : '暂无数据';
+                var FertilizerStus = status['FertilizerStus'] ? status['FertilizerStus'] : '暂无数据';
+                var EndAmount = status['EndAmount'] ? status['EndAmount'] : '暂无数据';
+                var StartAmount = status['StartAmount'] ? status['StartAmount'] : '暂无数据';
+                var SurplusAmount = status['SurplusAmount'] ? status['SurplusAmount'] : '暂无数据';
+                var TerminalStatus = status['TerminalStatus'] ? status['TerminalStatus'] : '暂无数据';
+                var ThisUsedAmount = status['ThisUsedAmount'] ? status['ThisUsedAmount'] : '暂无数据';
+                var TotalAmount = status['TotalAmount'] ? status['TotalAmount'] : '暂无数据';
+                var WaterFlow = status['WaterFlow'] ? status['WaterFlow'] : '暂无数据';
 
-            dom = "<div><div style='width: 600px;padding: 0 15px'>"
-            +"<div><h4>详细信息</h4></div><table class='table'>"
-            +"<tr><td class='table-head'>ID</td><td>"+status['DBID']+"</td>"
-            +"<td class='table-head'>用户卡号</td><td>"+status['CardCode']+"</td></tr>"
-            +"<tr><td class='table-head'>创建时间</td><td>"+CreateTime+"</td>"
-            +"<td class='table-head'>结束用量</td><td>"+EndAmount+"</td></tr>"
-            +"<tr><td class='table-head'>结束时间</td><td>"+EndTime+"</td>"
-            +"<td class='table-head'>施肥器状态</td><td>"+FertilizerStus+"</td></tr>"
-            +"<tr><td class='table-head'>起始用量</td><td>"+StartAmount+"</td>"
-            +"<td class='table-head'>开始时间</td><td>"+StartTime+"</td></tr>"
-            +"<tr><td class='table-head'>剩余量</td><td>"+SurplusAmount+"</td>"
-            +"<td class='table-head'>设备编号</td><td>"+status['TerminalCode']+"</td></tr>"
-            +"<tr><td class='table-head'>设备状态</td><td>"+TerminalStatus+"</td>"
-            +"<td class='table-head'>本次用量</td><td>"+ThisUsedAmount+"</td></tr>"
-            +"<tr><td class='table-head'>总用量</td><td>"+TotalAmount+"</td>"
-            +"<td class='table-head'>修改时间</td><td>"+updatetime+"</td></tr>"
-            +"<tr><td class='table-head'>流量、流速</td><td>"+WaterFlow+"</td>"
-            +"<td></td><td></td></tr>"
-            +"<table></div></div>";
-        } else {
-            dom = "<div><div style='min-height: 100px;width: 400px;padding: 0 15px'>"
-            +"<div><h4>详细信息</h4></div>"
-            +"<p>暂无数据</p>"
-            +"</div></div>";
+                dom = "<div><div style='width: 600px;padding: 0 15px'>"
+                +"<div style='text-align:center;'><h4>详细信息</h4></div><table class='table'>"
+                +"<tr><td class='table-head'>ID</td><td>"+status['DBID']+"</td>"
+                +"<td class='table-head'>用户卡号</td><td>"+status['CardCode']+"</td></tr>"
+                +"<tr><td class='table-head'>创建时间</td><td>"+CreateTime+"</td>"
+                +"<td class='table-head'>结束用量</td><td>"+EndAmount+"</td></tr>"
+                +"<tr><td class='table-head'>结束时间</td><td>"+EndTime+"</td>"
+                +"<td class='table-head'>施肥器状态</td><td>"+FertilizerStus+"</td></tr>"
+                +"<tr><td class='table-head'>起始用量</td><td>"+StartAmount+"</td>"
+                +"<td class='table-head'>开始时间</td><td>"+StartTime+"</td></tr>"
+                +"<tr><td class='table-head'>剩余量</td><td>"+SurplusAmount+"</td>"
+                +"<td class='table-head'>设备编号</td><td>"+status['TerminalCode']+"</td></tr>"
+                +"<tr><td class='table-head'>设备状态</td><td>"+TerminalStatus+"</td>"
+                +"<td class='table-head'>本次用量</td><td>"+ThisUsedAmount+"</td></tr>"
+                +"<tr><td class='table-head'>总用量</td><td>"+TotalAmount+"</td>"
+                +"<td class='table-head'>修改时间</td><td>"+updatetime+"</td></tr>"
+                +"<tr><td class='table-head'>流量、流速</td><td>"+WaterFlow+"</td>"
+                +"<td></td><td></td></tr>"
+                +"<table></div></div>";
+            } else {
+                dom = "<div><div style='min-height: 100px;width: 400px;padding: 0 15px'>"
+                +"<div><h4>详细信息</h4></div>"
+                +"<p>暂无数据</p>"
+                +"</div></div>";
+            }
+            
+            var popup = new OpenLayers.Popup.FramedCloud("xx", 
+                new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y),
+                null, dom, null, true);
+            map.addPopup(popup, true);
+            // console.log(popup);
+            selectControl.unselectAll(); 
         }
-         
-        var popup = new OpenLayers.Popup.FramedCloud("xx", 
-            new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y),
-            null, dom, null, true);
-        map.addPopup(popup, true);
-        // console.log(popup);
-        selectControl.unselectAll(); 
     }
+    
+   
     graphicLayer.events.on({ "featureselected": featureSelected }); 
     /*
     map.events.register('click', null, function (e) {          
