@@ -2,6 +2,7 @@
 var map; 
 var sdannoLayer = new SDRSAnnoLayer();
 var sdimgLayer = new SDRasterLayer(); 
+var yjfeature;
 $(function () { 
     map = new OpenLayers.Map("mapDiv", { 
         allOverlays: true, 
@@ -20,10 +21,29 @@ $(function () {
     var graphicLayer = new OpenLayers.Layer.Vector("graphicLayer",
         { style: OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']) });
     map.addLayer(graphicLayer);
+    //干管样式
     var zgStyle = {
         strokeColor: '#0080FF',
-        strokeWidth: 8,
+        strokeWidth: 11,
     };
+    //分干管样式
+    var fggStyle={
+        strokeColor: '#0080FF',
+        strokeWidth: 7,
+    }
+    //渲染分干管
+    for(var i = 0; i < fggCoordinates.length; i++) {
+        var lineStringArray = [];
+        for(var j = 0; j < fggCoordinates[i].length; j++) {
+            lineStringArray.push(
+                new OpenLayers.Geometry.Point(fggCoordinates[i][j].lon, fggCoordinates[i][j].lat)
+            );
+        }
+        var line = new OpenLayers.Geometry.LineString(lineStringArray); 
+        var fggfeature = new OpenLayers.Feature.Vector(line, {id:'fgg'+i}, fggStyle);
+        graphicLayer.addFeatures([fggfeature]);
+    };
+     //渲染干管
     for(var i = 0; i < zgCoordinates.length; i++) {
         var lineStringArray = [];
         for(var j = 0; j < zgCoordinates[i].length; j++) {
@@ -32,10 +52,9 @@ $(function () {
             );
         }
         var line = new OpenLayers.Geometry.LineString(lineStringArray); 
-            var feature = new OpenLayers.Feature.Vector(line, {i}, zgStyle);
-        graphicLayer.addFeatures([feature]);
+        var zgfeature = new OpenLayers.Feature.Vector(line, {id:'zg'+i}, zgStyle);
+        graphicLayer.addFeatures([zgfeature]);
     };
-
     var lineStyle = {
         strokeColor: '#cfcfcf',
         strokeWidth: 5,
@@ -49,12 +68,43 @@ $(function () {
             );
         }
         var line = new OpenLayers.Geometry.LineString(lineStringArray); 
-            var lineFeature = new OpenLayers.Feature.Vector(line, {i}, lineStyle);
+            var lineFeature = new OpenLayers.Feature.Vector(line, {id: 'line' + i}, lineStyle);
         lineFeatureArray.push(lineFeature);
         graphicLayer.addFeatures([lineFeature]);
     }
-
-
+    var circleStyle={
+        label:'出水口',
+        fontSize: "10px",
+        fontColor: "#ff0000",
+        labelXOffset: 0,
+        labelYOffset: 18,
+        strokeColor: "#0000ff", 
+        strokeWidth: 1, 
+        fillColor: "#0000ff", 
+        fillOpacity: 0.3 
+    }
+    //渲染出水口
+    for(var i=0;i<lineCoordinates.length;i++){
+         
+        if((lineCoordinates[i].length)<3){
+            console.log('1');
+            var coo=[(lineCoordinates[i][0].lon+lineCoordinates[i][1].lon)/2,(lineCoordinates[i][0].lat+lineCoordinates[i][1].lat)/2];
+            var circle = OpenLayers.Geometry.Polygon.createRegularPolygon(new OpenLayers.Geometry.Point(coo[0],coo[1]), 0.00015, 20, 0);
+            var circlefeature = new OpenLayers.Feature.Vector(circle, null, circleStyle); 
+            graphicLayer.addFeatures([circlefeature]); 
+        }
+    }
+    var csk=[
+        {lon:(lineCoordinates[0][1].lon+lineCoordinates[0][2].lon)/2,lat:(lineCoordinates[0][1].lat+lineCoordinates[0][2].lat)/2},
+        {lon:(lineCoordinates[22][1].lon+lineCoordinates[22][2].lon)/2,lat:(lineCoordinates[22][1].lat+lineCoordinates[22][2].lat)/2},
+        {lon:(lineCoordinates[43][0].lon+lineCoordinates[43][1].lon)/2,lat:(lineCoordinates[43][0].lat+lineCoordinates[43][1].lat)/2},
+        {lon:(lineCoordinates[44][0].lon+lineCoordinates[44][1].lon)/2,lat:(lineCoordinates[44][0].lat+lineCoordinates[44][1].lat)/2},
+    ];
+    for(var i=0;i<csk.length;i++){
+        var circle = OpenLayers.Geometry.Polygon.createRegularPolygon(new OpenLayers.Geometry.Point(csk[i].lon,csk[i].lat), 0.00015, 20, 0);
+        var circlefeature = new OpenLayers.Feature.Vector(circle, null, circleStyle); 
+        graphicLayer.addFeatures([circlefeature]); 
+    }
     var bengfangStyle = {
             externalGraphic: 'img/bengfang.png', 
             graphicWidth: 50, 
@@ -70,6 +120,7 @@ $(function () {
             graphicWidth: 30, 
             graphicHeight: 50
         };
+    
     // 渲染水表
     for(var i = 0; i < sbCoordinates.length; i++) {
         var pt = new OpenLayers.Geometry.Point(sbCoordinates[i].lon, sbCoordinates[i].lat);
@@ -87,38 +138,34 @@ $(function () {
             shuibiaoStyle.label = '' + (i + 1) + '';
         else
             shuibiaoStyle.label = '' + (i + 1 - 19) + '';
-        var feature = new OpenLayers.Feature.Vector(pt, {id: i}, shuibiaoStyle);
-        graphicLayer.addFeatures([feature]);
+        var sbfeature = new OpenLayers.Feature.Vector(pt, {id: i}, shuibiaoStyle);
+        graphicLayer.addFeatures([sbfeature]);
+    }
+    //预警
+    function yj(){
+        var yjStyle={
+            externalGraphic: 'img/timg.gif', 
+            graphicWidth: 50, 
+            graphicHeight: 50
+         }
+        var yjpt=new OpenLayers.Geometry.Point(117.93872,37.66654); 
+        yjfeature=new OpenLayers.Feature.Vector(yjpt, null, yjStyle);
+        graphicLayer.addFeatures([yjfeature]);
     }
     // 泵房
     for(var i = 0; i < bfCoordinates.length; i++) {
         var pt = new OpenLayers.Geometry.Point(bfCoordinates[i].lon, bfCoordinates[i].lat); 
-        var feature = new OpenLayers.Feature.Vector(pt, {id: 'bf' + i}, bengfangStyle);
-        graphicLayer.addFeatures([feature]);
+        var bffeature = new OpenLayers.Feature.Vector(pt, {id: 'bf' + i}, bengfangStyle);
+        graphicLayer.addFeatures([bffeature]);
     }
     // 气象站
     var pt = new OpenLayers.Geometry.Point(qxzCoordinates[0].lon, qxzCoordinates[0].lat); 
-    var feature = new OpenLayers.Feature.Vector(pt, {id: 'qx' + 0}, qixiangzhanStyle);
-    graphicLayer.addFeatures([feature]);
+    var qxfeature = new OpenLayers.Feature.Vector(pt, {id: 'qx' + 0}, qixiangzhanStyle);
+    graphicLayer.addFeatures([qxfeature]);
     // 土壤监测站
     var pt = new OpenLayers.Geometry.Point(trzCoordinates[0].lon, trzCoordinates[0].lat); 
-    var feature = new OpenLayers.Feature.Vector(pt, {id: 'tr' + 0}, turangzhanStyle);
-    graphicLayer.addFeatures([feature]);
-    
-    // 水流绘制
-    var flag = 0;
-    // 生成随机流水数组
-    var arr = [];
-    for(var i = 0; i < 5; i++){
-        arr[i] = parseInt(lineCoordinates.length * Math.random());
-    }
-    console.log(arr);
-    setTimeout(function(){    
-        for(var i = 0; i < lineCoordinates.length; i++) {
-            if($.inArray(i, arr) != -1)
-                move(0, 1, lineCoordinates[i]);
-        }
-    }, 500);
+    var trfeature = new OpenLayers.Feature.Vector(pt, {id: 'tr' + 0}, turangzhanStyle);
+    graphicLayer.addFeatures([trfeature]);
     ///根据序列点坐标 进行移动 
     function move(start, end, points) {
         var x1 = points[start].lon;
@@ -145,7 +192,7 @@ $(function () {
                 new OpenLayers.Geometry.Point(x1, y1),
                 new OpenLayers.Geometry.Point(x, y),
             ]);
-            var feature = new OpenLayers.Feature.Vector(line, null, {
+            var feature = new OpenLayers.Feature.Vector(line, {id:'line'}, {
                 strokeColor: '#0080FF',
                 strokeWidth: 5,
             });
@@ -184,14 +231,15 @@ $(function () {
         lonlat.transform(proj, this.map.getProjectionObject());  
         return lonlat;   
     }
-
     // 点击事件注册
     var selectControl = new OpenLayers.Control.SelectFeature([graphicLayer]);
     map.addControl(selectControl); 
     selectControl.activate(); 
     function featureSelected(fea) {
         var feature = fea.feature;
+        var classname = fea.feature.geometry.CLASS_NAME;
         var id = feature.data.id;
+        console.log(classname);
         //泵房点击事件
         if(/^bf/.test(id)){
             console.log(bfData[id].bfbh);
@@ -233,14 +281,14 @@ $(function () {
             var dom='';
             dom = "<div><div style='width: 620px;padding: 0 15px'>"
                 +"<div style='text-align:center;'><h4>详细信息</h4></div><table class='table'>"
-                +"<tr><td class='table-head'>空气温度</td><td>23.71</td>"
-                +"<td class='table-head'>空气湿度</td><td>66.48</td></tr>"
-                +"<tr><td class='table-head'>CO2浓度</td><td>462.04</td>"
-                +"<td class='table-head'>风向</td><td>19560.00</td></tr>"
-                +"<tr><td class='table-head'>风速</td><td >1.42</td>"
-                +"<td class='table-head'>光照</td><td>0.00</td></tr>"
-                +"<tr><td class='table-head'>降雨量</td><td>无降雨</td>"
-                +"<td colspan='2'></td></tr>"
+                +"<tr><td class='table-head'>创建时间</td><td>2016-05-25 14:43:30</td>"
+                +"<td class='table-head'>降雨</td><td>无降雨</td></tr>"
+                +"<tr><td class='table-head'>空气温度（℃）</td><td>23.76</td>"
+                +"<td class='table-head'>空气湿度（hPa）</td><td>39.02</td></tr>"
+                +"<tr><td class='table-head'>CO2浓度（ppm）</td><td>435.49</td>"
+                +"<td class='table-head'>风向</td><td>58740.00</td></tr>"
+                +"<tr><td class='table-head'>风速（m/s）</td><td >0.94</td>"
+                +"<td class='table-head'>光照（lx）</td><td>22.72</td></tr>"
                 +"<table></div></div>";
             var popup = new OpenLayers.Popup.FramedCloud("xx", 
                 new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y),
@@ -254,8 +302,10 @@ $(function () {
             var dom='';
             dom = "<div><div style='width: 620px;padding: 0 15px'>"
                 +"<div style='text-align:center;'><h4>详细信息</h4></div><table class='table'>"
-                +"<tr><td class='table-head'>土壤温度</td><td>19.45</td>"
-                +"<td class='table-head'>土壤湿度</td><td>18.52</td></tr>"
+                +"<tr><td class='table-head'>创建时间</td><td>2016-05-25 14:13:30</td>"
+                +"<td class='table-head'>土壤温度（℃）</td><td>19.45</td></tr>"
+                +"<tr><td class='table-head'>土壤湿度（hPa）</td><td>18.52</td>"
+                +"<td colspan='2'></td></tr>"
                 +"<table></div></div>";
             var popup = new OpenLayers.Popup.FramedCloud("xx", 
                 new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y),
@@ -264,6 +314,82 @@ $(function () {
             // console.log(popup);
             selectControl.unselectAll(); 
         }
+        //干管点击
+        else if(/^zg/.test(id)){
+            zgShow(id);
+            function zgShow(id){
+                var index=id.substring(2);
+                console.log(index);
+                var _lon=(zgCoordinates[index][0].lon+zgCoordinates[index][1].lon)/2;
+                var _lat=(zgCoordinates[index][0].lat+zgCoordinates[index][1].lat)/2;
+                var dom='';
+                dom = "<div><div style='width: 620px;padding: 0 15px'>"
+                    +"<div style='text-align:center;'><h4>干管信息</h4></div><table class='table'>"
+                    +"<tr><td class='table-head'>管段</td><td>"+zgData[id]['gd']+"</td>"
+                    +"<td class='table-head'>可供同时工作给水栓个数</td><td>"+zgData[id]['count']+"</td></tr>"
+                    +"<tr><td class='table-head'>设计流量（m³/h）</td><td>"+zgData[id]['sjflow']+"</td>"
+                    +"<td class='table-head'>计算管道内径（mm）</td><td>"+zgData[id]['sjnj']+"</td></tr>"
+                    +"<tr><td class='table-head'>选择管径(mm）</td><td>"+zgData[id]['xzgj']+"</td>"
+                    +"<td class='table-head'>管段条数</td><td>"+zgData[id]['gdts']+"</td></tr>"
+                    +"<tr><td class='table-head'>管段长度（m）</td><td>"+zgData[id]['gdcd']+"</td>"
+                    +"<td colspan='2'></td></tr>"
+                    +"<table></div></div>";
+                var popup = new OpenLayers.Popup.FramedCloud("xx", 
+                    new OpenLayers.LonLat(_lon,_lat),
+                    null, dom, null, true);
+                map.addPopup(popup, true);
+                // console.log(popup);
+                selectControl.unselectAll(); 
+            }
+       }
+       //分干管点击
+        else if(/^fgg/.test(id)){
+            fggShow(id);
+            function fggShow(id){
+                var index=id.substring(3);
+                //console.log(index);
+                var _lon=(fggCoordinates[index][0].lon+fggCoordinates[index][1].lon)/2;
+                var _lat=(fggCoordinates[index][0].lat+fggCoordinates[index][1].lat)/2;
+                var dom='';
+                dom = "<div><div style='width: 620px;padding: 0 15px'>"
+                    +"<div style='text-align:center;'><h4>分干管信息</h4></div><table class='table'>"
+                    +"<tr><td class='table-head'>管段</td><td>"+fggData[id]['gd']+"</td>"
+                    +"<td class='table-head'>可供同时工作给水栓个数</td><td>"+fggData[id]['count']+"</td></tr>"
+                    +"<tr><td class='table-head'>设计流量（m³/h）</td><td>"+fggData[id]['sjflow']+"</td>"
+                    +"<td class='table-head'>计算管道内径（mm）</td><td>"+fggData[id]['sjnj']+"</td></tr>"
+                    +"<tr><td class='table-head'>选择管径(mm）</td><td>"+fggData[id]['xzgj']+"</td>"
+                    +"<td class='table-head'>管段条数</td><td>"+fggData[id]['gdts']+"</td></tr>"
+                    +"<tr><td class='table-head'>管段长度（m）</td><td>"+fggData[id]['gdcd']+"</td>"
+                    +"<td colspan='2'></td></tr>"
+                    +"<table></div></div>";
+                var popup = new OpenLayers.Popup.FramedCloud("xx", 
+                    new OpenLayers.LonLat(_lon,_lat),
+                    null, dom, null, true);
+                map.addPopup(popup, true);
+                // console.log(popup);
+                selectControl.unselectAll(); 
+            }
+       }
+        //支管道点击
+       else if(classname.match(/LineString/)){
+           var index=id.substring(4);
+           var dom='';
+            dom = "<div><div style='width: 620px;padding: 0 15px'>"
+                +"<div style='text-align:center;'><h4>支管信息</h4></div><table class='table'>"
+                +"<tr><td class='table-head'>可供同时工作给水栓个数</td><td>1</td>"
+                +"<td class='table-head'>设计流量（m³/h）</td><td>60</td></tr>"
+                +"<tr><td class='table-head'>计算管道内径（mm）</td><td>132.94</td>"
+                +"<td class='table-head'>选择管径(mm）</td><td>160</td></tr>"
+                +"<tr><td class='table-head'>管段条数</td><td>41</td>"
+                +"<td class='table-head'>管段长度（m）</td><td>15478</td></tr>"
+                +"<table></div></div>";
+            var popup = new OpenLayers.Popup.FramedCloud("xx", 
+                new OpenLayers.LonLat(lineCoordinates[index][0].lon, lineCoordinates[index][0].lat),
+                null, dom, null, true);
+            map.addPopup(popup, true);
+            // console.log(popup);
+            selectControl.unselectAll(); 
+       }
         //水表点击
         else{
             // 检索当前水表状态
@@ -332,13 +458,43 @@ $(function () {
     
    
     graphicLayer.events.on({ "featureselected": featureSelected }); 
-    /*
-    map.events.register('click', null, function (e) {          
+    
+    /*map.events.register('click', null, function (e) {
         var pos = $(map.div).offset();
         //坐标转换
         var px = new OpenLayers.Pixel(e.clientX - pos.left, e.clientY - pos.top);
         var lonlat = map.getLonLatFromPixel(px);
         alert(lonlat.lon.toFixed(5) + ";" + lonlat.lat.toFixed(5));
-    })
-    */
+    })*/
+    var yjflag=0;
+    //模拟流水和预警
+    $(document).keydown(function(event){
+        //alert(event.keyCode);//弹出按键的对应值 
+        if(event.keyCode==81){
+            if(!yjflag){
+                yj();
+                yjflag=1;
+            }
+        }
+        if(event.keyCode==65){
+            graphicLayer.removeFeatures([yjfeature]);
+            yjflag=0;
+        }
+        if(event.keyCode==87){
+            // 水流绘制
+            var flag = 0;
+            // 生成随机流水数组
+            var arr = [];
+            for(var i = 0; i < 5; i++){
+                arr[i] = parseInt(lineCoordinates.length/2 * Math.random());
+            }
+            console.log(arr);
+            setTimeout(function(){    
+                for(var i = 0; i < lineCoordinates.length/2; i++) {
+                    if($.inArray(i, arr) != -1)
+                        move(0, 1, lineCoordinates[i]);
+                }
+            }, 500);
+        }
+    });
 }); 
